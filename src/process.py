@@ -1,5 +1,6 @@
 import sys
 import random
+from src.score import getScore
 
 def howManyPossibilities (arraySize):
     return arraySize * arraySize
@@ -38,6 +39,7 @@ def correctionDiagonal(arrayVerifier, arrayPoubelle):
     print("\033[31mInvalide\033[0m")
     for n in arrayPoubelle:
         print(n)
+    return arrayVerifier
 
 
 def correction (array):
@@ -53,7 +55,7 @@ def correction (array):
         else:
             arrayPoubelle.append(n)
     if len(arrayVerifier):
-        correctionDiagonal(arrayVerifier, arrayPoubelle)
+        return correctionDiagonal(arrayVerifier, arrayPoubelle)
 
 def processCreate (arraySize):
     array = []
@@ -62,7 +64,13 @@ def processCreate (arraySize):
         for n in range(arraySize):
             subArray.append(random.randrange(-1, arraySize))
         array.append(subArray)
-    correction(array)
+
+    # Prise des score
+    getScore(correction(array), arraySize)
+    # on prend ce qu'il y a
+    # si il y en a beaucoup on prend les n meilleur
+    # on les fait evoluer
+    # on relance
 
 
 def processStart ():
