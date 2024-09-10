@@ -5,35 +5,33 @@ def howManyPossibilities (arraySize):
     return arraySize * arraySize
 
 def areOnSameDiagonal (p1, p2):
-    # print("\033[36mareOnSameDiagonal:\033[0m")
-    # print(p1, p2)
     x1, y1 = p1
     x2, y2 = p2
 
-    if abs(x1 - y1) == abs(x2 - y2):
-        return True
-    if (x1 + y1) == (x2 + y2):
+    if x1 < 0 or y1 < 0 or x2 < 0 or y2 < 0:
+        return False
+    if abs(x2 - x1) == abs(y2 - y1):
         return True
     return False
 
-def correctionDiagonal (arrayVerifier, arrayPoubelle):
-    print("\033[35mCorrectionDiagonal:\033[0m")
-    for index, value in enumerate(arrayVerifier):
-        print("", value)
+def correctionDiagonal(arrayVerifier, arrayPoubelle):
+    arrayVerifierCopy = arrayVerifier[:]
+
+    for index, value in enumerate(arrayVerifierCopy):
         inter = []
+
         for i, val in enumerate(value):
-            inter.append(((i), (val)))
-            # print(inter[len(inter) - 1])
+            inter.append((i, val))
         for i, val in enumerate(inter):
-            print("----", inter[i])
-            j = i
-            while j < (len(inter) - 1):
-                print("--------", inter[j], areOnSameDiagonal(inter[i], inter[j]))
+            j = i + 1
+            while j < (len(inter)):
                 if areOnSameDiagonal(inter[i], inter[j]):
                     arrayPoubelle.append(value)
-                    arrayVerifier.pop(index)
+                    if value in arrayVerifier:
+                        arrayVerifier.remove(value)
                     break
                 j += 1
+
     print("\033[32mValide\033[0m")
     for n in arrayVerifier:
         print(n)
@@ -43,7 +41,6 @@ def correctionDiagonal (arrayVerifier, arrayPoubelle):
 
 
 def correction (array):
-    print("\033[35mCorrectionPerpendiculaire:\033[0m")
     arrayVerifier = []
     arrayPoubelle = []
     for n in array:
@@ -55,27 +52,16 @@ def correction (array):
             arrayVerifier.append(n)
         else:
             arrayPoubelle.append(n)
-
-    print("\033[32mValide\033[0m")
-    for n in arrayVerifier:
-        print(n)
-    print("\033[31mInvalide\033[0m")
-    for n in arrayPoubelle:
-        print(n)
     if len(arrayVerifier):
         correctionDiagonal(arrayVerifier, arrayPoubelle)
 
 def processCreate (arraySize):
-    # Calculer le nombre de possibilité
     array = []
-    # Generation des tableau
     for i in range(howManyPossibilities(arraySize)):
         subArray = []
         for n in range(arraySize):
             subArray.append(random.randrange(-1, arraySize))
         array.append(subArray)
-    # print(array)
-    # Verification du score
     correction(array)
 
 
