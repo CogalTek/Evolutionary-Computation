@@ -1,4 +1,5 @@
-def getScore (array, max):
-    print("------- getScore")
-    for n in array :
-        print(n, ":", (max - n.count(-1)))
+def getScore(array, max):
+    scoredArray = []
+    for n in array:
+        scoredArray.append((n, max - n.count(-1)))
+    return scoredArray
