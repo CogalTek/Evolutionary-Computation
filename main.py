@@ -6,7 +6,7 @@ def main () :
     if len(sys.argv) > 1 :
         if "-h" in sys.argv or "--h" in sys.argv or "--help" in sys.argv:
             displayHelp()
-        elif "-x" in sys.argv :
+        elif "-n" in sys.argv :
             processStart()
     else :
         displayHelp()
