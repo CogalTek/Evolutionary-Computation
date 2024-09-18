@@ -99,16 +99,16 @@ def processCreate(arraySize):
 
 def processStart():
     try:
-        if "-x" not in sys.argv:
-            raise ValueError("L'option '-x' est manquante dans les arguments.")
+        if "-n" not in sys.argv:
+            raise ValueError("L'option '-n' est manquante dans les arguments.")
 
-        if len(sys.argv) <= (sys.argv.index("-x") + 1):
-            raise IndexError("Aucun argument après '-x'.")
+        if len(sys.argv) <= (sys.argv.index("-n") + 1):
+            raise IndexError("Aucun argument après '-n'.")
 
-        index = sys.argv.index("-x") + 1
+        index = sys.argv.index("-n") + 1
 
         if not sys.argv[index].isnumeric() or int(sys.argv[index]) < 1:
-            raise ValueError("L'argument après '-x' doit être un entier supérieur ou égal à 1.")
+            raise ValueError("L'argument après '-n' doit être un entier supérieur ou égal à 1.")
 
         processCreate(int(sys.argv[index]))
 
