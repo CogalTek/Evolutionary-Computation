@@ -39,13 +39,13 @@ def correction(array):
             arrayVerifier.append(n)
         else:
             arrayPoubelle.append(n)
-    
+
     if not arrayVerifier:
         return None
     return correctionDiagonal(arrayVerifier, arrayPoubelle)
 
 def genArray(arraySize):
-    population_size = max(10, arraySize * 2) 
+    population_size = max(10, arraySize * 2)
     array = []
     for _ in range(population_size):
         subArray = [random.randrange(-1, arraySize) for _ in range(arraySize)]
@@ -54,16 +54,16 @@ def genArray(arraySize):
 
 def evolve(generation, arraySize, mutationRate=None, populationSize=None):
     if mutationRate is None:
-        mutationRate = min(0.1, 1 / arraySize)  
+        mutationRate = min(0.1, 1 / arraySize)
     if populationSize is None:
-        populationSize = max(10, arraySize * 2) 
+        populationSize = max(10, arraySize * 2)
 
     sortedArray = sorted(generation, key=lambda x: x[1], reverse=True)
-    bestParents = sortedArray[:min(5, len(sortedArray))] 
+    bestParents = sortedArray[:min(5, len(sortedArray))]
 
     if len(bestParents) < 2:
         print(f"Pas assez de parents pour générer la nouvelle population, taille : {len(bestParents)}")
-        return generation  
+        return generation
 
     newGeneration = []
 
@@ -91,9 +91,9 @@ def evolve(generation, arraySize, mutationRate=None, populationSize=None):
 
 def displayGeneration(generation, genNumber):
     print(f"\033[36mGénération {genNumber} :\033[0m")
-    
+
     max_score = max(generation, key=lambda x: x[1])[1] if generation else 0
-    
+
     for i, (array, score) in enumerate(generation):
         color = "\033[32m" if score == max_score else "\033[31m"
         print(f"{color}Score {i + 1} : {score}\033[0m")
@@ -108,7 +108,7 @@ def displayBoard(array):
             if array[row] == col:
                 line += " Q "
             else:
-                line += " . " 
+                line += " . "
         print(line)
     print("\n")
 
@@ -122,17 +122,17 @@ def processCreate(arraySize):
         if array is not None and len(array) > 0:
             generation = getScore(array, arraySize)
             displayGeneration(generation, i + 1)
-            
+
             # Check if we've found a solution
             best_score = max(generation, key=lambda x: x[1])[1]
             if best_score == arraySize:
                 print(f"Solution found in generation {i+1}")
                 break
-            
+
             array = evolve(generation, arraySize)
         else:
             array = genArray(arraySize)
-    
+
     if i == max_generations - 1:
         print("Maximum generations reached without finding a solution")
 
