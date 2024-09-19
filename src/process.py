@@ -115,7 +115,7 @@ def displayBoard(array):
 def processCreate(arraySize):
     array = genArray(arraySize)
     generation = []
-    max_generations = 1000
+    max_generations = 1000000
 
     for i in range(max_generations):
         array = correction(array)
