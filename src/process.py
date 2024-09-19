@@ -127,7 +127,7 @@ def processCreate(arraySize):
             best_score = max(generation, key=lambda x: x[1])[1]
             if best_score == arraySize:
                 print(f"Solution found in generation {i+1}")
-                break
+                sys.exit(0)  # Stop the program after finding the solution
 
             array = evolve(generation, arraySize)
         else:
