@@ -1,0 +1,1 @@
+import{_ as n,x as o,y as r,v as t}from"./GCxZkvxi.js";const l={};function s(a,e){return t(),o("div",null,e[0]||(e[0]=[r("h1",null,"Hello world",-1)]))}const d=n(l,[["render",s]]);export{d as default};

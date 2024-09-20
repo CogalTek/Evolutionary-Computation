@@ -62,7 +62,7 @@ def evolve(generation, arraySize, mutationRate=None, populationSize=None):
     bestParents = sortedArray[:min(5, len(sortedArray))]
 
     if len(bestParents) < 2:
-        print(f"Pas assez de parents pour générer la nouvelle population, taille : {len(bestParents)}")
+        # print(f"Pas assez de parents pour générer la nouvelle population, taille : {len(bestParents)}")
         return generation
 
     newGeneration = []
@@ -90,14 +90,17 @@ def evolve(generation, arraySize, mutationRate=None, populationSize=None):
     return newGeneration
 
 def displayGeneration(generation, genNumber):
-    print(f"\033[36mGénération {genNumber} :\033[0m")
+    # print(f"\033[36mGénération {genNumber} :\033[0m")
 
-    max_score = max(generation, key=lambda x: x[1])[1] if generation else 0
+    # max_score = max(generation, key=lambda x: x[1])[1] if generation else 0
 
-    for i, (array, score) in enumerate(generation):
-        color = "\033[32m" if score == max_score else "\033[31m"
-        print(f"{color}Score {i + 1} : {score}\033[0m")
-        displayBoard(array)
+    print(genNumber, ":", generation)
+
+    # for i, (array, score) in enumerate(generation):
+    #     print(array)
+    #     color = "\033[32m" if score == max_score else "\033[31m"
+    #     print(f"{color}Score {i + 1} : {score}\033[0m")
+    #     displayBoard(array)
 
 def displayBoard(array):
     """Affiche le tableau 2D des reines."""
@@ -126,7 +129,7 @@ def processCreate(arraySize):
             # Check if we've found a solution
             best_score = max(generation, key=lambda x: x[1])[1]
             if best_score == arraySize:
-                print(f"Solution found in generation {i+1}")
+                # print(f"Solution found in generation {i+1}")
                 sys.exit(0)  # Stop the program after finding the solution
 
             array = evolve(generation, arraySize)

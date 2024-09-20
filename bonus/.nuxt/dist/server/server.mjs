@@ -1,0 +1,1 @@
+export { default } from "file:///Users/mathieurio/delivery/Ju/Evolutionary-Computation/bonus/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"
