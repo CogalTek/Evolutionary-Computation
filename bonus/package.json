@@ -1,0 +1,20 @@
+{
+  "name": "nuxt-app",
+  "dependencies": {
+    "@nuxt/ui": "latest",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
+    "nuxt": "^3.13.0",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "type": "module"
+}
