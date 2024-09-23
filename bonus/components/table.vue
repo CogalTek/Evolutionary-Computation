@@ -10,7 +10,7 @@
 
 <style>
     .Hej {
-        background-color: red;
+        background-color: rgb(236, 236, 236);
         height: 300px;
         width: 300px;
         -webkit-transform: scaleX(-1);
@@ -34,6 +34,7 @@
 
 <script setup>
     const index = ref();
+
     const props = defineProps({
         tableau: Array
     });
