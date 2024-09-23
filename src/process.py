@@ -1,4 +1,5 @@
 import sys
+import math
 import random
 from src.score import getScore
 
@@ -112,10 +113,33 @@ def displayBoard(array):
         print(line)
     print("\n")
 
+def expected_generations(population_size, mutation_rate, success_probability, n):
+    """
+    population_size: Taille de la population
+    mutation_rate: Taux de mutation (ex. 0.1 pour 10%)
+    success_probability: Probabilité d'améliorer la solution à chaque génération
+    n: Taille de l'échiquier
+    """
+    # Probabilité de trouver une solution dans une génération
+    initial_prob = 1 / (n ** n)  # Probabilité initiale très faible
+    effective_prob = initial_prob * success_probability  # Probabilité avec amélioration génétique
+
+    # Nombre moyen de générations pour trouver la solution
+    generations = math.log(1 - success_probability) / math.log(1 - effective_prob)
+    return generations
+
 def processCreate(arraySize):
     array = genArray(arraySize)
     generation = []
-    max_generations = 1000000
+    max_generations = 10000000
+
+    # Paramètres pour la probabilité
+    population_size = max(10, arraySize * 2)
+    mutation_rate = 0.1
+    success_probability = 0.5
+
+    estimated_generations = expected_generations(population_size, mutation_rate, success_probability, arraySize)
+    print(f"Nombre attendu de générations pour résoudre N-queens avec N={arraySize} : {estimated_generations:.2f}")
 
     for i in range(max_generations):
         array = correction(array)
