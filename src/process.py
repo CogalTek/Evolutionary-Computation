@@ -1,50 +1,54 @@
 import sys
 import math
 import random
-from src.score import getScore
+from src.score import getScore  # Import the scoring function
 
-def howManyPossibilities(arraySize):
-    return arraySize * arraySize
-
+# Check if two points are on the same diagonal
 def areOnSameDiagonal(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
 
+    # If any point is out of bounds, return False
     if x1 < 0 or y1 < 0 or x2 < 0 or y2 < 0:
         return False
+
     return abs(x2 - x1) == abs(y2 - y1)
 
-def correctionDiagonal(arrayVerifier, arrayPoubelle):
-    arrayVerifierCopy = arrayVerifier[:]
+# Remove elements on the same diagonal
+def correctionDiagonal(validArrays, discardedArrays):
+    validArraysCopy = validArrays[:]
 
-    for value in arrayVerifierCopy:
-        inter = [(i, val) for i, val in enumerate(value)]
-        for i in range(len(inter)):
-            for j in range(i + 1, len(inter)):
-                if areOnSameDiagonal(inter[i], inter[j]):
-                    arrayPoubelle.append(value)
-                    if value in arrayVerifier:
-                        arrayVerifier.remove(value)
+    for value in validArraysCopy:
+        positions = [(i, val) for i, val in enumerate(value)]
+        for i in range(len(positions)):
+            for j in range(i + 1, len(positions)):
+                if areOnSameDiagonal(positions[i], positions[j]):
+                    discardedArrays.append(value)
+                    if value in validArrays:
+                        validArrays.remove(value)
                     break
-    return arrayVerifier
+    return validArrays
 
+# Validate and correct the array (remove invalid or redundant elements)
 def correction(array):
-    arrayVerifier = []
-    arrayPoubelle = []
-    for n in array:
-        valide = True
-        for value in n:
-            if not isinstance(value, int) or (value >= 0 and n.count(value) > 1):
-                valide = False
-        if valide:
-            arrayVerifier.append(n)
+    validArrays = []
+    discardedArrays = []
+    for subArray in array:
+        isValid = True
+        for value in subArray:
+            # Check if the value is an integer and if it's unique in the subArray
+            if not isinstance(value, int) or (value >= 0 and subArray.count(value) > 1):
+                isValid = False
+        if isValid:
+            validArrays.append(subArray)
         else:
-            arrayPoubelle.append(n)
+            discardedArrays.append(subArray)
 
-    if not arrayVerifier:
+    if not validArrays:
         return None
-    return correctionDiagonal(arrayVerifier, arrayPoubelle)
+    return correctionDiagonal(validArrays, discardedArrays)
 
+# Generate an initial population of arrays
 def genArray(arraySize):
     population_size = max(10, arraySize * 2)
     array = []
@@ -53,25 +57,24 @@ def genArray(arraySize):
         array.append(subArray)
     return array
 
-def evolve(generation, arraySize, mutationRate=None, populationSize=None):
-    if mutationRate is None:
-        mutationRate = min(0.1, 1 / arraySize)
-    if populationSize is None:
-        populationSize = max(10, arraySize * 2)
+# Evolve a generation by crossover and mutation
+def evolve(generation, arraySize):
+    mutationRate = min(0.1, 1 / arraySize)
+    populationSize = max(10, arraySize * 2)
 
-    sortedArray = sorted(generation, key=lambda x: x[1], reverse=True)
-    bestParents = sortedArray[:min(5, len(sortedArray))]
+    # Sort the generation based on score, select the best parents
+    sortedGeneration = sorted(generation, key=lambda x: x[1], reverse=True)
+    bestParents = sortedGeneration[:min(5, len(sortedGeneration))]
 
     if len(bestParents) < 2:
-        # print(f"Pas assez de parents pour générer la nouvelle population, taille : {len(bestParents)}")
-        return generation
+        return generation  # Return the same generation if not enough parents
 
     newGeneration = []
 
     while len(newGeneration) < populationSize:
         parent1, parent2 = random.sample(bestParents, 2)
 
-        # Croisement : combine les éléments des deux parents
+        # Crossover: Combine elements from both parents
         child = []
         for i in range(arraySize):
             if random.random() < 0.5:
@@ -79,108 +82,76 @@ def evolve(generation, arraySize, mutationRate=None, populationSize=None):
             else:
                 child.append(parent2[0][i])
 
-        # Mutation
+        # Mutation: Randomly change an element
         if random.random() < mutationRate:
             mutationIndex = random.randint(0, arraySize - 1)
             child[mutationIndex] = random.randint(-1, arraySize - 1)
 
-        # Calculer le score de l'enfant
+        # Calculate the score of the child
         child_score = getScore([child], arraySize)[0][1]
         newGeneration.append((child, child_score))
 
     return newGeneration
 
-def displayGeneration(generation, genNumber):
-    # print(f"\033[36mGénération {genNumber} :\033[0m")
-
-    # max_score = max(generation, key=lambda x: x[1])[1] if generation else 0
-
-    print(genNumber, ":", generation)
-
-    # for i, (array, score) in enumerate(generation):
-    #     print(array)
-    #     color = "\033[32m" if score == max_score else "\033[31m"
-    #     print(f"{color}Score {i + 1} : {score}\033[0m")
-    #     displayBoard(array)
-
-def displayBoard(array):
-    """Affiche le tableau 2D des reines."""
-    n = len(array)
-    for row in range(n):
-        line = ""
-        for col in range(n):
-            if array[row] == col:
-                line += " Q "
-            else:
-                line += " . "
-        print(line)
-    print("\n")
-
+# Estimate the expected number of generations needed to solve the N-queens problem
 def expected_generations(population_size, mutation_rate, success_probability, n):
-    """
-    population_size: Taille de la population
-    mutation_rate: Taux de mutation (ex. 0.1 pour 10%)
-    success_probability: Probabilité d'améliorer la solution à chaque génération
-    n: Taille de l'échiquier
-    """
-    # Probabilité de trouver une solution dans une génération
-    initial_prob = 1 / (n ** n)  # Probabilité initiale très faible
-    effective_prob = initial_prob * success_probability  # Probabilité avec amélioration génétique
+    initial_prob = 1 / (n ** n)  # Very low initial probability
+    effective_prob = initial_prob * success_probability  # Probability with genetic improvement
 
-    # Nombre moyen de générations pour trouver la solution
+    # Average number of generations to find a solution
     generations = math.log(1 - success_probability) / math.log(1 - effective_prob)
     return generations
 
+# Main process to solve the N-queens problem using evolutionary computation
 def processCreate(arraySize):
     array = genArray(arraySize)
     generation = []
     max_generations = 10000000
 
-    # Paramètres pour la probabilité
     population_size = max(10, arraySize * 2)
     mutation_rate = 0.1
     success_probability = 0.5
 
     estimated_generations = expected_generations(population_size, mutation_rate, success_probability, arraySize)
-    print(f"Nombre attendu de générations pour résoudre N-queens avec N={arraySize} : {estimated_generations:.2f}")
+    print(f"Expected number of generations to solve N-queens with N={arraySize}: {estimated_generations:.2f}")
 
     for i in range(max_generations):
         array = correction(array)
         if array is not None and len(array) > 0:
             generation = getScore(array, arraySize)
-            displayGeneration(generation, i + 1)
+            print(i + 1, ":", generation)
 
-            # Check if we've found a solution
             best_score = max(generation, key=lambda x: x[1])[1]
             if best_score == arraySize:
-                # print(f"Solution found in generation {i+1}")
-                sys.exit(0)  # Stop the program after finding the solution
+                return  # Stop if solution found
 
             array = evolve(generation, arraySize)
         else:
+            # print(i + 1, ":", "[]") # Display empty array
             array = genArray(arraySize)
 
     if i == max_generations - 1:
         print("Maximum generations reached without finding a solution")
 
+# Start the process, handling the command-line arguments
 def processStart():
     try:
         if "-n" not in sys.argv:
-            raise ValueError("L'option '-n' est manquante dans les arguments.")
+            raise ValueError("The '-n' option is missing from the arguments.")
 
         if len(sys.argv) <= (sys.argv.index("-n") + 1):
-            raise IndexError("Aucun argument après '-n'.")
+            raise IndexError("No argument provided after '-n'.")
 
         index = sys.argv.index("-n") + 1
 
         if not sys.argv[index].isnumeric() or int(sys.argv[index]) < 1:
-            raise ValueError("L'argument après '-n' doit être un entier supérieur ou égal à 1.")
+            raise ValueError("The argument after '-n' must be an integer >= 1.")
 
-        processCreate(int(sys.argv[index]))
+        return processCreate(int(sys.argv[index]))
 
     except ValueError as ve:
-        print(f"Erreur de valeur : {ve}")
+        print(f"Value Error: {ve}")
     except IndexError as ie:
-        print(f"Erreur d'index : {ie}")
+        print(f"Index Error: {ie}")
     except Exception as e:
-        print(f"Une exception s'est produite : {e}")
+        print(f"An unexpected error occurred: {e}")
