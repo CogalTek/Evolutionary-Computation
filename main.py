@@ -14,8 +14,7 @@ def main():
         # Display help if -h, --h, or --help is provided
         if "-h" in sys.argv or "--h" in sys.argv or "--help" in sys.argv:
             displayHelp()
-        # Start the main process if -n is provided
-        elif "-n" in sys.argv:
+        else:
             processStart()
     else:
         # If no arguments, display help by default

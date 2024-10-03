@@ -2,6 +2,11 @@ import sys
 import math
 import random
 from src.score import getScore  # Import the scoring function
+from src.evolve.commun import evolve
+from src.evolve.one_point import evolve_one_point_crossover
+from src.evolve.two_point import evolve_two_point_crossover
+
+evolveType = 'commun'
 
 # Check if two points are on the same diagonal
 def areOnSameDiagonal(p1, p2):
@@ -57,41 +62,7 @@ def genArray(arraySize):
         array.append(subArray)
     return array
 
-# Evolve a generation by crossover and mutation
-def evolve(generation, arraySize):
-    mutationRate = min(0.1, 1 / arraySize)
-    populationSize = max(10, arraySize * 2)
 
-    # Sort the generation based on score, select the best parents
-    sortedGeneration = sorted(generation, key=lambda x: x[1], reverse=True)
-    bestParents = sortedGeneration[:min(5, len(sortedGeneration))]
-
-    if len(bestParents) < 2:
-        return generation  # Return the same generation if not enough parents
-
-    newGeneration = []
-
-    while len(newGeneration) < populationSize:
-        parent1, parent2 = random.sample(bestParents, 2)
-
-        # Crossover: Combine elements from both parents
-        child = []
-        for i in range(arraySize):
-            if random.random() < 0.5:
-                child.append(parent1[0][i])
-            else:
-                child.append(parent2[0][i])
-
-        # Mutation: Randomly change an element
-        if random.random() < mutationRate:
-            mutationIndex = random.randint(0, arraySize - 1)
-            child[mutationIndex] = random.randint(-1, arraySize - 1)
-
-        # Calculate the score of the child
-        child_score = getScore([child], arraySize)[0][1]
-        newGeneration.append((child, child_score))
-
-    return newGeneration
 
 # Estimate the expected number of generations needed to solve the N-queens problem
 def expected_generations(population_size, mutation_rate, success_probability, n):
@@ -125,7 +96,13 @@ def processCreate(arraySize):
             if best_score == arraySize:
                 return  # Stop if solution found
 
-            array = evolve(generation, arraySize)
+            match evolveType:
+                case 'commun':
+                    array = evolve(generation, arraySize)
+                case 'one':
+                    array = evolve_one_point_crossover(generation, arraySize)
+                case 'two':
+                    array = evolve_two_point_crossover(generation, arraySize)
         else:
             # print(i + 1, ":", "[]") # Display empty array
             array = genArray(arraySize)
@@ -139,13 +116,25 @@ def processStart():
         if "-n" not in sys.argv:
             raise ValueError("The '-n' option is missing from the arguments.")
 
+        if "-s" not in sys.argv:
+            raise ValueError("The '-s' option is missing from the arguments.")
+
         if len(sys.argv) <= (sys.argv.index("-n") + 1):
             raise IndexError("No argument provided after '-n'.")
 
+        if len(sys.argv) <= (sys.argv.index("-s") + 1):
+            raise IndexError("No argument provided after '-s'.")
+
         index = sys.argv.index("-n") + 1
+        evolveTypeIndex = sys.argv.index("-s") + 1
 
         if not sys.argv[index].isnumeric() or int(sys.argv[index]) < 1:
             raise ValueError("The argument after '-n' must be an integer >= 1.")
+
+        if sys.argv[evolveTypeIndex] != "commun" and sys.argv[evolveTypeIndex] != "one" and sys.argv[evolveTypeIndex] != "two":
+            raise ValueError("The argument after '-s' is not good.")
+        else:
+            evolveType = sys.argv[evolveTypeIndex]
 
         return processCreate(int(sys.argv[index]))
 
